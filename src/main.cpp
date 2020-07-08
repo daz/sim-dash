@@ -13,6 +13,7 @@ void update();
 CHSV color;
 CRGB leds[LED_NUM_LEDS];
 bool switchState;
+bool configMode = false;
 
 void setup() {
   pinMode(SWITCH_PIN, INPUT);
@@ -26,21 +27,18 @@ void loop() {
 }
 
 void update() {
-  static bool firstRun = true;
   bool newSwitchState = (digitalRead(SWITCH_PIN) == HIGH);
-  if (!firstRun && newSwitchState == switchState) {
-    return;
-  }
+  uint16_t dialValue = analogRead(DIAL_PIN);
 
-  firstRun = false;
+
   switchState = newSwitchState;
 
-  uint8_t brightness = map(analogRead(DIAL_PIN), 0, 1023, 0, LED_MAX_BRIGHTNESS);
-
   if (switchState) {
-    color.setHSV(0, 255, brightness);
+    color.hue = 0;
+    color.saturation = 255;
+    color.value = map(dialValue, 0, 1023, 0, LED_MAX_BRIGHTNESS);
   } else {
-    color.setHSV(0, 255, brightness);
+    color.setHSV(0, 255, 0);
   }
 
   for (size_t i = 0; i < LED_NUM_LEDS; i++) {
